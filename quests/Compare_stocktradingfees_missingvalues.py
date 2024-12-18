@@ -2,8 +2,8 @@
 
 from pymongo import MongoClient
 # 네트워크 연결 규칙 : protocol://ip:port/path 
+# 되도록 환경값 불러와서 쓰자 매직 넘버 쓰지 말자 
 client = MongoClient('mongodb://192.168.0.91:27017/')
-
 db_name = client["DB_TEST"]
 col_target_name = db_name["COL_COMPARE_FEE"]
 
@@ -17,6 +17,7 @@ import numpy as np
     3. 계좌별 결측치 있는지 
 '''
 
+# 되도록 쿼리 짜서 필터링 해서 가져오자
 data_cursor = col_target_name.find({})
 data_list = list(data_cursor)
 print(len(data_list))
@@ -144,5 +145,14 @@ df_mean_value['avg'] = df_filled['회사명'].map(df_mean)
 df_fin = df_mean_value[['회사명','거래금액','스마트폰.1','avg']].sort_values(by=['회사명','거래금액','스마트폰.1','avg'],ascending=[True,True,True,True])
 df_fin.head()
 
-df_fin[df_fin['avg'] <= total_mean].to_csv("/apps/study_pandas/datasets/Q_Compare_fee_fillnan.csv")
+import os
+
+# 현재 작업 디렉토리 가져오기
+current_dir = os.getcwd()
+
+# 상대 경로 생성
+output_path = os.path.join(current_dir, "datasets", "Q_Compare_fee_fillnan.csv")
+
+# 되도록 cwd 받아서 상대경로로 하자 
+df_fin[df_fin['avg'] <= total_mean].to_csv(output_path)
 df_fin[df_fin['avg'] <= total_mean].head()
